@@ -172,8 +172,10 @@ https://zhanghanboke.github.io/?live2d=on      # 重新打开
 blog-source/
 ├── .github/workflows/deploy.yml   # 自动部署工作流
 ├── public/                        # 原样拷贝的静态资源
-│   ├── avatar.svg                 # 头像
-│   ├── favicon.svg
+│   ├── avatar.jpg                 # 头像
+│   ├── favicon.png
+│   ├── apple-touch-icon.png
+│   ├── bg/bg.jpg                  # 背景壁纸
 │   └── live2d/                    # 看板娘（见上文「看板娘」一节）
 ├── scripts/new-post.mjs           # 新建文章的脚本
 ├── src/
