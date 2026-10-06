@@ -17,48 +17,52 @@ const tags = collectTags(posts).slice(0, 14);
 <BaseLayout>
   <div class="container">
     <section class="hero">
-      <div class="hero-card">
-        <div class="hero-body">
-          {
-            SITE.avatar && (
-              <img
-                class="hero-avatar"
-                src={SITE.avatar}
-                alt={SITE.author}
-                width="88"
-                height="88"
-              />
-            )
-          }
+      <div class="hero-inner">
+        {
+          SITE.avatar && (
+            <img
+              class="hero-avatar"
+              src={SITE.avatar}
+              alt={SITE.author}
+              width="96"
+              height="96"
+            />
+          )
+        }
 
-          <div>
-            <h1 class="hero-title">你好，我是 <span class="grad">{SITE.author}</span></h1>
-            <p class="hero-desc">{SITE.description}</p>
+        <div>
+          <h1 class="hero-title">你好，我是 <span class="grad">{SITE.author}</span></h1>
+          <p class="hero-desc">{SITE.description}</p>
 
-            <div class="socials">
-              {
-                SITE.socials.map((s) => (
-                  <a
-                    class="social"
-                    href={s.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Icon name={s.icon} size={15} />
-                    {s.name}
-                  </a>
-                ))
-              }
-            </div>
+          <div class="socials">
+            {
+              SITE.socials.map((s) => (
+                <a
+                  class="social"
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Icon name={s.icon} size={15} />
+                  {s.name}
+                </a>
+              ))
+            }
           </div>
         </div>
       </div>
     </section>
 
     <section>
-      <div class="section-head">
-        <h2 class="section-title">最新文章</h2>
-        {posts.length > 0 && <a class="section-more" href="/archive/">全部 {posts.length} 篇 →</a>}
+      <div class="sec">
+        <div class="sec-left">
+          <span class="sec-bar"></span>
+          <div>
+            <div class="sec-kicker">Article Index</div>
+            <h2 class="sec-title">最新文章</h2>
+          </div>
+        </div>
+        {posts.length > 0 && <a class="sec-more" href="/archive/">全部 {posts.length} 篇 →</a>}
       </div>
 
       {
@@ -79,10 +83,16 @@ const tags = collectTags(posts).slice(0, 14);
 
     {
       tags.length > 0 && (
-        <section style="margin-top: 44px">
-          <div class="section-head">
-            <h2 class="section-title">标签</h2>
-            <a class="section-more" href="/tags/">全部标签 →</a>
+        <section style="margin-top: 52px">
+          <div class="sec">
+            <div class="sec-left">
+              <span class="sec-bar" />
+              <div>
+                <div class="sec-kicker">Tags</div>
+                <h2 class="sec-title">标签</h2>
+              </div>
+            </div>
+            <a class="sec-more" href="/tags/">全部标签 →</a>
           </div>
 
           <div class="tag-cloud">

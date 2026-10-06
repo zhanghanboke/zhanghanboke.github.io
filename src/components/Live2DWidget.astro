@@ -1,0 +1,19 @@
+---
+/**
+ * Live2D 看板娘（左下角）
+ *
+ * 运行时资源自持在 public/live2d/ 下，这里是整站唯一的注入点：
+ *   autoload.js        加载器（同源装载 + 模型镜像降级 + 桌面端门控 + 懒加载）
+ *   waifu.css          上游原版样式
+ *   live2d-theme.css   本站主题适配层（SVG 图标替代 Font Awesome + 深浅色）
+ *   live2d.min.js      Live2D Cubism 2 运行时
+ *   waifu-tips.js      看板娘主体逻辑
+ *   waifu-tips.json    悬停/点击提示语（已按本站 DOM 重写选择器）
+ *
+ * 用 is:inline 是因为 autoload.js 需要以经典脚本形式自行按需加载子资源，
+ * 交给 Astro 打包会变成 module 并被提前请求，失去懒加载的意义。
+ * 想永久关掉：访问任意页面时带上 ?live2d=off
+ */
+---
+
+<script is:inline src="/live2d/autoload.js" defer></script>

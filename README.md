@@ -99,6 +99,73 @@ src/pages/now.astro     →  /now/
 
 ---
 
+## 看板娘（Live2D）
+
+左下角那只，基于 [stevenjoezhang/live2d-widget](https://github.com/stevenjoezhang/live2d-widget)（MIT），
+资源全部自持在 `public/live2d/` 下，不在构建流程里。
+
+| 文件 | 作用 |
+| --- | --- |
+| `autoload.js` | 加载器（本站自己写的，见下） |
+| `live2d-theme.css` | 主题适配层（本站自己写的） |
+| `waifu.css` | 上游原版样式 |
+| `live2d.min.js` | Live2D Cubism 2 运行时 |
+| `waifu-tips.js` | 看板娘主体逻辑（上游原版，未改动） |
+| `waifu-tips.json` | 悬停/点击提示语（选择器已按本站 DOM 重写） |
+
+### 和上游原版的区别
+
+1. **资源自持**：上游 `autoload.js` 从 `jsDelivr@latest` 拉 css/js，上游一发新版就可能把站点搞挂；
+   现在同源加载 `/live2d/`，只有**模型**还走 CDN。
+2. **模型镜像降级**：依次探测 `cdn → fastly → gcore → testingcf` 四个 jsDelivr 镜像，
+   哪个通就用哪个，并记进 `localStorage`，之后直接复用。
+3. **桌面端门控 + 懒加载**：窗口宽度 < 768px 完全不加载；桌面端等到 `window.load`
+   之后的空闲时段才启动，不抢首屏。
+4. **不引入图标字体**：上游工具栏用的是 Font Awesome 类名，这里用 `mask-image` +
+   内联 SVG 替代（`live2d-theme.css`），少一个 ~300KB 的请求，图标颜色还能跟随深浅色主题。
+5. **失败静默降级**：任何环节出错都只往 console 打一条 warn，不影响页面正常使用。
+
+### 换模型 / 换默认造型
+
+可用模型列在模型源的 `model_list.json` 里，共 7 组：
+
+| 索引 | 模型 |
+| --- | --- |
+| 0 | Potion-Maker/Pio |
+| 1 | Potion-Maker/Tia ← **默认** |
+| 2 | bilibili-live/22 |
+| 3 | bilibili-live/33 |
+| 4 | ShizukuTalk（雫，2 种材质） |
+| 5 | HyperdimensionNeptunia（海王星系列，20 种） |
+| 6 | KantaiCollection/murakumo |
+
+默认造型由上游 `waifu-tips.js` 里 `initModel()` 的 `modelId` 决定（当前是 `1`）。
+不改代码也可以：把鼠标移到看板娘上，用工具栏第 3、4 个图标现场切换，
+选择会存进 `localStorage`。
+
+### 关掉它
+
+访问任意页面时带上参数即可（会写进 `localStorage`，永久生效）：
+
+```text
+https://zhanghanboke.github.io/?live2d=off     # 关掉
+https://zhanghanboke.github.io/?live2d=on      # 重新打开
+```
+
+点工具栏最后一个 ✕ 也可以关，但那只管 24 小时（上游逻辑）。
+
+### 改提示语
+
+直接编辑 `public/live2d/waifu-tips.json`：
+
+- `mouseover` / `click` 里的 `selector` 用 CSS 选择器匹配元素，`text` 是随机挑一句显示
+- **顺序即优先级**，命中第一条就停，所以具体的选择器要写在前面
+- 注意事件委托用的是 `event.target.matches()`，匹配的是**最深层元素**，
+  所以带图标的链接要写成 `.nav-link, .nav-link *` 才能覆盖到里面的 `<svg>`
+- `seasons` 是节日彩蛋，按日期区间匹配，不用动
+
+---
+
 ## 目录结构
 
 ```text
@@ -106,16 +173,17 @@ blog-source/
 ├── .github/workflows/deploy.yml   # 自动部署工作流
 ├── public/                        # 原样拷贝的静态资源
 │   ├── avatar.svg                 # 头像
-│   └── favicon.svg
+│   ├── favicon.svg
+│   └── live2d/                    # 看板娘（见上文「看板娘」一节）
 ├── scripts/new-post.mjs           # 新建文章的脚本
 ├── src/
-│   ├── components/                # Icon / Header / Footer / PostCard / Toc
+│   ├── components/                # Icon / Header / Footer / PostCard / Toc / Live2DWidget
 │   ├── content/
 │   │   ├── posts/                 # ← 文章都放这里
 │   │   └── ...
 │   ├── content.config.ts          # frontmatter 字段校验规则
 │   ├── layouts/
-│   │   ├── BaseLayout.astro       # 全站骨架（head、主题切换、返回顶部）
+│   │   ├── BaseLayout.astro       # 全站骨架（head、主题切换、返回顶部、看板娘挂载点）
 │   │   └── PostLayout.astro       # 文章页骨架（目录、版权、上下篇）
 │   ├── pages/
 │   │   ├── index.astro            # 首页

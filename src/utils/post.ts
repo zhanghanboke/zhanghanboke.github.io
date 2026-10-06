@@ -46,6 +46,16 @@ export function readingTime(body: string = ''): number {
   return Math.max(1, Math.round(minutes));
 }
 
+/** 正文字数（中文按字、英文按词），用于列表项展示 */
+export function wordCount(body: string = ''): number {
+  const clean = body
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/<[^>]+>/g, ' ');
+  const cjk = (clean.match(/[\u4e00-\u9fa5]/g) || []).length;
+  const words = (clean.match(/[a-zA-Z]+/g) || []).length;
+  return cjk + words;
+}
+
 /** 按年份分组，年份倒序、组内日期倒序 */
 export function groupByYear(posts: CollectionEntry<'posts'>[]) {
   const map = new Map<number, CollectionEntry<'posts'>[]>();

@@ -1,0 +1,118 @@
+/* ==========================================================================
+   小涵的博客 · Live2D 看板娘主题适配层
+   加载顺序必须在 waifu.css 之后，用于覆盖上游默认样式。
+
+   做三件事：
+     1. 用内联 SVG（mask-image）替代 Font Awesome 工具栏图标
+        —— 上游 waifu-tips.js 里 toolbar 用的是 <span class="fa fa-xxx">，
+           需要 fontawesome 才能显示；这里改成 mask，图标颜色可跟随主题，
+           且完全不引入图标字体（少 ~300KB 请求）。
+     2. 让提示气泡 / 工具栏跟随本站深浅色主题（复用 global.css 的 CSS 变量）。
+     3. 手机端彻底隐藏（autoload.js 已做 JS 门控，这里是双保险）。
+   ========================================================================== */
+
+/* ---------- 1. 工具栏：SVG mask 图标 ---------- */
+#waifu-tool span {
+  display: block;
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  /* 空 span + block 才有盒子；颜色交给 mask 的 background-color 控制 */
+  background-color: #7b8c9d;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: 17px 17px;
+  mask-size: 17px 17px;
+  transition: background-color 0.3s;
+}
+
+#waifu-tool span:hover {
+  background-color: #0684bd;
+}
+
+#waifu-tool .fa-comment {
+  -webkit-mask-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAyNCAyNCc+PHBhdGggZD0nTTIgNGExIDEgMCAwIDEgMS0xaDE4YTEgMSAwIDAgMSAxIDF2MTFhMSAxIDAgMCAxLTEgMUg4bC02IDRWNHonLz48L3N2Zz4=');
+  mask-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAyNCAyNCc+PHBhdGggZD0nTTIgNGExIDEgMCAwIDEgMS0xaDE4YTEgMSAwIDAgMSAxIDF2MTFhMSAxIDAgMCAxLTEgMUg4bC02IDRWNHonLz48L3N2Zz4=');
+}
+
+#waifu-tool .fa-paper-plane {
+  -webkit-mask-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAyNCAyNCc+PHBhdGggZD0nTTIgMjFsMjEtOUwyIDN2N2wxNSAyLTE1IDJ2N3onLz48L3N2Zz4=');
+  mask-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAyNCAyNCc+PHBhdGggZD0nTTIgMjFsMjEtOUwyIDN2N2wxNSAyLTE1IDJ2N3onLz48L3N2Zz4=');
+}
+
+#waifu-tool .fa-user-circle {
+  -webkit-mask-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAyNCAyNCc+PHBhdGggZD0nTTEyIDJhMTAgMTAgMCAxIDAgMCAyMCAxMCAxMCAwIDAgMCAwLTIwem0wIDRhMy41IDMuNSAwIDEgMSAwIDcgMy41IDMuNSAwIDAgMSAwLTd6bTAgMTVjLTIuNSAwLTQuNy0xLjItNi4xLTMgLjktMiAzLjMtMy4yIDYuMS0zLjJzNS4yIDEuMiA2LjEgMy4yQTcuNSA3LjUgMCAwIDEgMTIgMjF6Jy8+PC9zdmc+');
+  mask-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAyNCAyNCc+PHBhdGggZD0nTTEyIDJhMTAgMTAgMCAxIDAgMCAyMCAxMCAxMCAwIDAgMCAwLTIwem0wIDRhMy41IDMuNSAwIDEgMSAwIDcgMy41IDMuNSAwIDAgMSAwLTd6bTAgMTVjLTIuNSAwLTQuNy0xLjItNi4xLTMgLjktMiAzLjMtMy4yIDYuMS0zLjJzNS4yIDEuMiA2LjEgMy4yQTcuNSA3LjUgMCAwIDEgMTIgMjF6Jy8+PC9zdmc+');
+}
+
+#waifu-tool .fa-street-view {
+  -webkit-mask-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAyNCAyNCc+PHBhdGggZD0nTTcgN2gxMGwtMy0zIDEuNC0xLjRMMjAuOCA4bC01LjQgNS40TDE0IDEybDMtM0g3Vjd6bTEwIDEwSDdsMyAzLTEuNCAxLjRMMy4yIDE2bDUuNC01LjRMMTAgMTJsLTMgM2gxMHYyeicvPjwvc3ZnPg==');
+  mask-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAyNCAyNCc+PHBhdGggZD0nTTcgN2gxMGwtMy0zIDEuNC0xLjRMMjAuOCA4bC01LjQgNS40TDE0IDEybDMtM0g3Vjd6bTEwIDEwSDdsMyAzLTEuNCAxLjRMMy4yIDE2bDUuNC01LjRMMTAgMTJsLTMgM2gxMHYyeicvPjwvc3ZnPg==');
+}
+
+#waifu-tool .fa-camera-retro {
+  -webkit-mask-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAyNCAyNCc+PHBhdGggZD0nTTkgM2g2bDEuNSAySDIxYTEgMSAwIDAgMSAxIDF2MTNhMSAxIDAgMCAxLTEgMUgzYTEgMSAwIDAgMS0xLTFWNmExIDEgMCAwIDEgMS0xaDQuNUw5IDN6bTMgNS41YTUgNSAwIDEgMCAwIDEwIDUgNSAwIDAgMCAwLTEwem0wIDJhMyAzIDAgMSAxIDAgNiAzIDMgMCAwIDEgMC02eicvPjwvc3ZnPg==');
+  mask-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAyNCAyNCc+PHBhdGggZD0nTTkgM2g2bDEuNSAySDIxYTEgMSAwIDAgMSAxIDF2MTNhMSAxIDAgMCAxLTEgMUgzYTEgMSAwIDAgMS0xLTFWNmExIDEgMCAwIDEgMS0xaDQuNUw5IDN6bTMgNS41YTUgNSAwIDEgMCAwIDEwIDUgNSAwIDAgMCAwLTEwem0wIDJhMyAzIDAgMSAxIDAgNiAzIDMgMCAwIDEgMC02eicvPjwvc3ZnPg==');
+}
+
+#waifu-tool .fa-info-circle {
+  -webkit-mask-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAyNCAyNCc+PHBhdGggZD0nTTEyIDJhMTAgMTAgMCAxIDAgMCAyMCAxMCAxMCAwIDAgMCAwLTIwem0xIDE1aC0ydi02aDJ2NnptMC04aC0yVjdoMnYyeicvPjwvc3ZnPg==');
+  mask-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAyNCAyNCc+PHBhdGggZD0nTTEyIDJhMTAgMTAgMCAxIDAgMCAyMCAxMCAxMCAwIDAgMCAwLTIwem0xIDE1aC0ydi02aDJ2NnptMC04aC0yVjdoMnYyeicvPjwvc3ZnPg==');
+}
+
+#waifu-tool .fa-times {
+  -webkit-mask-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAyNCAyNCc+PHBhdGggZD0nTTYuNCA1TDUgNi40IDEwLjYgMTIgNSAxNy42IDYuNCAxOSAxMiAxMy40IDE3LjYgMTkgMTkgMTcuNiAxMy40IDEyIDE5IDYuNCAxNy42IDUgMTIgMTAuNnonLz48L3N2Zz4=');
+  mask-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAyNCAyNCc+PHBhdGggZD0nTTYuNCA1TDUgNi40IDEwLjYgMTIgNSAxNy42IDYuNCAxOSAxMiAxMy40IDE3LjYgMTkgMTkgMTcuNiAxMy40IDEyIDE5IDYuNCAxNy42IDUgMTIgMTAuNnonLz48L3N2Zz4=');
+}
+
+/* ---------- 2. 提示气泡：跟随本站主题变量 ---------- */
+#waifu-tips {
+  background-color: var(--card, #ffffff);
+  border: 1px solid var(--line, #e9e9ec);
+  border-radius: 12px;
+  box-shadow: 0 4px 18px 2px rgba(0, 0, 0, 0.08);
+  color: var(--text, #18181b);
+  font-size: 13.5px;
+  line-height: 22px;
+  min-height: 64px;
+}
+
+#waifu-tips span {
+  color: var(--accent, #0d9488);
+}
+
+/* ---------- 3. 隐藏后露出的侧边把手 ---------- */
+#waifu-toggle {
+  background-color: var(--accent, #0d9488);
+  border-radius: 0 6px 6px 0;
+}
+
+/* ---------- 4. 深色主题 ---------- */
+[data-theme='dark'] #waifu-tool span {
+  background-color: #9aa0a6;
+}
+
+[data-theme='dark'] #waifu-tool span:hover {
+  background-color: #2dd4bf;
+}
+
+[data-theme='dark'] #waifu-tips {
+  background-color: #1f1f22;
+  border-color: #333338;
+  box-shadow: 0 4px 18px 2px rgba(0, 0, 0, 0.5);
+  color: #ededed;
+}
+
+[data-theme='dark'] #waifu-tips span {
+  color: #2dd4bf;
+}
+
+/* ---------- 5. 手机端隐藏（双保险） ---------- */
+@media (max-width: 767px) {
+  #waifu,
+  #waifu-toggle {
+    display: none !important;
+  }
+}

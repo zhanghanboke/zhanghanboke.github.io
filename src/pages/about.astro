@@ -5,9 +5,15 @@ import { SITE } from '../site.config';
 ---
 
 <BaseLayout title="关于" description={`关于 ${SITE.author} 和这个博客。`}>
-  <div class="container">
+  <div class="container container--content">
     <div class="page-head">
-      <h1 class="page-title">关于</h1>
+      <div class="sec-left" style="margin-bottom: 10px">
+        <span class="sec-bar"></span>
+        <div>
+          <div class="sec-kicker">About</div>
+          <h1 class="page-title">关于</h1>
+        </div>
+      </div>
       <p class="page-desc">一个软件工程学生的个人站点。</p>
     </div>
 
@@ -72,7 +78,8 @@ import { SITE } from '../site.config';
           写，提交到 GitHub 后由 Actions 自动构建并发布到 GitHub Pages。
         </p>
         <p style="margin: 0; color: var(--text-secondary)">
-          早期版本是 Hexo + Stun 主题，2026 年 10 月重做迁移到这个版本。
+          视觉调性参考了 Firefly 主题：中性灰阶打底，只保留一个强调色。
+          早期版本是 Hexo + Stun，2026 年 10 月重做迁移。
         </p>
       </section>
     </div>

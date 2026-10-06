@@ -1,46 +1,68 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import Icon from './Icon.astro';
-import { formatDate, getExcerpt, readingTime } from '../utils/post';
+import { formatDate, getExcerpt, readingTime, wordCount } from '../utils/post';
 
 interface Props {
   post: CollectionEntry<'posts'>;
 }
 
 const { post } = Astro.props;
-const { title, date, tags = [], description } = post.data;
+const { title, date, tags = [], description, cover } = post.data;
 
 const excerpt = description || getExcerpt(post.body, 108);
 const minutes = readingTime(post.body);
+const words = wordCount(post.body);
 ---
 
 <article class="post-card">
-  <h3 class="post-card-title">
-    <a href={`/posts/${post.id}/`}>{title}</a>
-  </h3>
+  <div class="post-card-body">
+    {
+      tags.length > 0 && (
+        <div class="post-card-tags">
+          {tags.slice(0, 4).map((tag) => (
+            <a class="tag" href={`/tags/${encodeURIComponent(tag)}/`}>
+              #{tag}
+            </a>
+          ))}
+        </div>
+      )
+    }
 
-  {excerpt && <p class="post-card-excerpt">{excerpt}</p>}
+    <h3 class="post-card-title">
+      <a href={`/posts/${post.id}/`}>{title}</a>
+    </h3>
 
-  <div class="post-card-meta">
-    <span class="meta-item">
-      <Icon name="calendar" size={13} />
-      {formatDate(date)}
-    </span>
-    <span class="meta-item">
-      <Icon name="clock" size={13} />
-      {minutes} 分钟
-    </span>
+    {excerpt && <p class="post-card-excerpt">{excerpt}</p>}
+
+    <div class="post-card-meta">
+      <span class="meta-item">
+        <Icon name="calendar" size={12.5} />
+        {formatDate(date)}
+      </span>
+      <span class="meta-dot"></span>
+      <span class="meta-item">
+        <Icon name="clock" size={12.5} />
+        {minutes} 分钟
+      </span>
+      <span class="meta-dot"></span>
+      <span class="meta-item">
+        <Icon name="file" size={12.5} />
+        {words} 字
+      </span>
+    </div>
   </div>
 
   {
-    tags.length > 0 && (
-      <div class="post-card-tags" style="margin-top: 12px">
-        {tags.map((tag) => (
-          <a class="tag" href={`/tags/${encodeURIComponent(tag)}/`}>
-            #{tag}
-          </a>
-        ))}
-      </div>
+    cover && (
+      <img
+        class="post-card-cover"
+        src={cover}
+        alt=""
+        loading="lazy"
+        width="178"
+        height="104"
+      />
     )
   }
 </article>

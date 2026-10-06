@@ -5,7 +5,7 @@ import BaseLayout from './BaseLayout.astro';
 import Icon from '../components/Icon.astro';
 import Toc from '../components/Toc.astro';
 import { SITE } from '../site.config';
-import { formatDate, readingTime } from '../utils/post';
+import { formatDate, readingTime, wordCount } from '../utils/post';
 
 interface Props {
   post: CollectionEntry<'posts'>;
@@ -16,41 +16,51 @@ interface Props {
 
 const { post, headings, prev, next } = Astro.props;
 const { title, date, updated, tags = [], category, description } = post.data;
+
+const crumbHref = category ? `/tags/${encodeURIComponent(category)}/` : '/archive/';
+const crumbText = category ?? '文章列表';
 ---
 
 <BaseLayout title={title} description={description} type="article" progress>
   <div class="container">
+    <nav class="crumb" aria-label="面包屑">
+      <a href="/">首页</a>
+      <Icon name="chevron-right" size={12} />
+      <a href={crumbHref}>{crumbText}</a>
+      <Icon name="chevron-right" size={12} />
+      <span>此文章</span>
+    </nav>
+
     <div class="post-layout">
       <article class="post">
-        <header class="post-header">
+        <header class="post-hero">
           <h1 class="post-title">{title}</h1>
 
           <div class="post-meta">
             <span class="meta-item">
-              <Icon name="calendar" size={13} />
+              <Icon name="calendar" size={12.5} />
               {formatDate(date)}
             </span>
-
+            <span class="meta-dot"></span>
             <span class="meta-item">
-              <Icon name="clock" size={13} />
+              <Icon name="clock" size={12.5} />
               {readingTime(post.body)} 分钟
             </span>
-
-            {
-              category && (
-                <span class="meta-item">
-                  <Icon name="folder" size={13} />
-                  {category}
-                </span>
-              )
-            }
+            <span class="meta-dot"></span>
+            <span class="meta-item">
+              <Icon name="file" size={12.5} />
+              {wordCount(post.body)} 字
+            </span>
 
             {
               updated && (
-                <span class="meta-item">
-                  <Icon name="edit" size={13} />
-                  更新于 {formatDate(updated)}
-                </span>
+                <>
+                  <span class="meta-dot"></span>
+                  <span class="meta-item">
+                    <Icon name="edit" size={12.5} />
+                    更新于 {formatDate(updated)}
+                  </span>
+                </>
               )
             }
           </div>
@@ -67,6 +77,20 @@ const { title, date, updated, tags = [], category, description } = post.data;
             )
           }
         </header>
+
+        {
+          description && (
+            <div class="abstract">
+              <span class="abstract-icon">
+                <Icon name="sparkles" size={16} />
+              </span>
+              <div>
+                <span class="abstract-label">摘要</span>
+                {description}
+              </div>
+            </div>
+          )
+        }
 
         <div class="prose">
           <slot />

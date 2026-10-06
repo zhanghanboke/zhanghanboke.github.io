@@ -2,7 +2,6 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostCard from '../../components/PostCard.astro';
-import Icon from '../../components/Icon.astro';
 import { collectTags } from '../../utils/post';
 
 export async function getStaticPaths() {
@@ -25,19 +24,23 @@ const posts = (
 ---
 
 <BaseLayout title={`#${tag}`} description={`标签「${tag}」下的全部文章，共 ${posts.length} 篇。`}>
-  <div class="container">
+  <div class="container container--content">
     <div class="page-head">
-      <h1 class="page-title">#{tag}</h1>
-      <p class="page-desc">
-        <Icon name="file" size={14} /> 共 {posts.length} 篇文章
-      </p>
+      <div class="sec-left" style="margin-bottom: 10px">
+        <span class="sec-bar"></span>
+        <div>
+          <div class="sec-kicker">Tag</div>
+          <h1 class="page-title">#{tag}</h1>
+        </div>
+      </div>
+      <p class="page-desc">共 {posts.length} 篇文章</p>
     </div>
 
     <div class="post-list">
       {posts.map((post) => <PostCard post={post} />)}
     </div>
 
-    <p style="margin-top: 32px">
+    <p style="margin-top: 34px">
       <a href="/tags/">← 返回全部标签</a>
     </p>
   </div>

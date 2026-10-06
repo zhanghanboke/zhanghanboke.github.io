@@ -9,12 +9,16 @@ const tags = collectTags(posts);
 ---
 
 <BaseLayout title="标签" description={`共 ${tags.length} 个标签。`}>
-  <div class="container">
+  <div class="container container--content">
     <div class="page-head">
-      <h1 class="page-title">标签</h1>
-      <p class="page-desc">
-        <Icon name="tag" size={14} /> 共 {tags.length} 个标签
-      </p>
+      <div class="sec-left" style="margin-bottom: 10px">
+        <span class="sec-bar"></span>
+        <div>
+          <div class="sec-kicker">Tags</div>
+          <h1 class="page-title">标签</h1>
+        </div>
+      </div>
+      <p class="page-desc">共 {tags.length} 个标签</p>
     </div>
 
     {

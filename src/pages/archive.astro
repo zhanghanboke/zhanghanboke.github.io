@@ -12,11 +12,17 @@ const groups = groupByYear(posts);
 ---
 
 <BaseLayout title="归档" description={`共 ${posts.length} 篇文章，按年份归档。`}>
-  <div class="container">
+  <div class="container container--content">
     <div class="page-head">
-      <h1 class="page-title">归档</h1>
+      <div class="sec-left" style="margin-bottom: 10px">
+        <span class="sec-bar"></span>
+        <div>
+          <div class="sec-kicker">Archive</div>
+          <h1 class="page-title">归档</h1>
+        </div>
+      </div>
       <p class="page-desc">
-        <Icon name="file" size={14} /> 共 {posts.length} 篇文章，跨越 {groups.length} 个年份
+        共 {posts.length} 篇文章，跨越 {groups.length} 个年份
       </p>
     </div>
 

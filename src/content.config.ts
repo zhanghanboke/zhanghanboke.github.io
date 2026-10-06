@@ -29,6 +29,9 @@ const posts = defineCollection({
     /** 分类，如 category: 技术笔记 */
     category: z.string().optional(),
 
+    /** 封面图路径（可选）。放 public/ 下用 / 开头，没填就不显示缩略图 */
+    cover: z.string().optional(),
+
     /** 草稿：true 时不会出现在任何列表和构建产物里 */
     draft: z.boolean().default(false),
   }),

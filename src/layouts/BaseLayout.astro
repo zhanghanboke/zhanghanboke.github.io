@@ -4,6 +4,7 @@ import { SITE } from '../site.config';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Icon from '../components/Icon.astro';
+import Live2DWidget from '../components/Live2DWidget.astro';
 
 interface Props {
   title?: string;
@@ -54,11 +55,15 @@ const ogImage = new URL(SITE.avatar, SITE.url).href;
     <script is:inline>
       (function () {
         try {
+          var forced = new URLSearchParams(location.search).get('theme');
           var saved = localStorage.getItem('theme');
           var prefersDark =
             window.matchMedia &&
             window.matchMedia('(prefers-color-scheme: dark)').matches;
-          var theme = saved || (prefersDark ? 'dark' : 'light');
+          var theme =
+            forced === 'dark' || forced === 'light'
+              ? forced
+              : saved || (prefersDark ? 'dark' : 'light');
           document.documentElement.setAttribute('data-theme', theme);
         } catch (e) {
           document.documentElement.setAttribute('data-theme', 'light');
@@ -85,6 +90,8 @@ const ogImage = new URL(SITE.avatar, SITE.url).href;
     <button class="back-to-top" id="back-to-top" aria-label="返回顶部" title="返回顶部">
       <Icon name="arrow-up" size={17} />
     </button>
+
+    <Live2DWidget />
 
     <script>
       /* 主题切换 */
