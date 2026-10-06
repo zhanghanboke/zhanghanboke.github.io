@@ -1,0 +1,20 @@
+{
+  "name": "zhanghan-blog",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "description": "张涵的个人博客 — Astro 驱动",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "new": "node scripts/new-post.mjs"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^8.0.2",
+    "@astrojs/rss": "^4.0.19",
+    "@astrojs/sitemap": "^3.7.4",
+    "astro": "^7.3.5"
+  }
+}

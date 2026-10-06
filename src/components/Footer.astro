@@ -1,0 +1,24 @@
+---
+import { SITE } from '../site.config';
+import Icon from './Icon.astro';
+
+const year = new Date().getFullYear();
+const range = year > SITE.since ? `${SITE.since}–${year}` : `${SITE.since}`;
+---
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <div>
+      <span>© {range} {SITE.author}</span>
+      <span> · 用</span>
+      <Icon name="heart" size={13} class="footer-heart" />
+      <span>和 Astro 搭建</span>
+    </div>
+
+    <div class="footer-links">
+      {SITE.socials.map((s) => <a href={s.href} target="_blank" rel="noopener noreferrer">{s.name}</a>)}
+      <a href="/rss.xml">RSS</a>
+      <a href="/about/">关于</a>
+    </div>
+  </div>
+</footer>

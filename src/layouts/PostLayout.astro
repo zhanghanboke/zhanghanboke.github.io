@@ -1,0 +1,118 @@
+---
+import type { MarkdownHeading } from 'astro';
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from './BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import Toc from '../components/Toc.astro';
+import { SITE } from '../site.config';
+import { formatDate, readingTime } from '../utils/post';
+
+interface Props {
+  post: CollectionEntry<'posts'>;
+  headings: MarkdownHeading[];
+  prev?: CollectionEntry<'posts'>;
+  next?: CollectionEntry<'posts'>;
+}
+
+const { post, headings, prev, next } = Astro.props;
+const { title, date, updated, tags = [], category, description } = post.data;
+---
+
+<BaseLayout title={title} description={description} type="article" progress>
+  <div class="container">
+    <div class="post-layout">
+      <article class="post">
+        <header class="post-header">
+          <h1 class="post-title">{title}</h1>
+
+          <div class="post-meta">
+            <span class="meta-item">
+              <Icon name="calendar" size={13} />
+              {formatDate(date)}
+            </span>
+
+            <span class="meta-item">
+              <Icon name="clock" size={13} />
+              {readingTime(post.body)} 分钟
+            </span>
+
+            {
+              category && (
+                <span class="meta-item">
+                  <Icon name="folder" size={13} />
+                  {category}
+                </span>
+              )
+            }
+
+            {
+              updated && (
+                <span class="meta-item">
+                  <Icon name="edit" size={13} />
+                  更新于 {formatDate(updated)}
+                </span>
+              )
+            }
+          </div>
+
+          {
+            tags.length > 0 && (
+              <div class="post-meta-tags">
+                {tags.map((tag) => (
+                  <a class="tag" href={`/tags/${encodeURIComponent(tag)}/`}>
+                    #{tag}
+                  </a>
+                ))}
+              </div>
+            )
+          }
+        </header>
+
+        <div class="prose">
+          <slot />
+        </div>
+
+        <footer class="post-footer">
+          <div class="license">
+            <Icon name="copyright" size={14} />
+            <span>
+              本文采用
+              <a href={SITE.license.href} target="_blank" rel="noopener noreferrer">
+                {SITE.license.name}
+              </a>
+              许可协议，转载请注明出处。
+            </span>
+          </div>
+
+          {
+            (prev || next) && (
+              <nav class="post-nav" aria-label="上下篇导航">
+                {prev ? (
+                  <a class="post-nav-item" href={`/posts/${prev.id}/`}>
+                    <span class="post-nav-label">← 上一篇</span>
+                    <span class="post-nav-title">{prev.data.title}</span>
+                  </a>
+                ) : (
+                  <span />
+                )}
+
+                {next ? (
+                  <a class="post-nav-item is-next" href={`/posts/${next.id}/`}>
+                    <span class="post-nav-label">下一篇 →</span>
+                    <span class="post-nav-title">{next.data.title}</span>
+                  </a>
+                ) : (
+                  <span />
+                )}
+              </nav>
+            )
+          }
+        </footer>
+      </article>
+
+      <aside aria-label="侧栏">
+        <Toc headings={headings} />
+      </aside>
+    </div>
+  </div>
+</BaseLayout>

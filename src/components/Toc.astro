@@ -1,0 +1,73 @@
+---
+import type { MarkdownHeading } from 'astro';
+
+interface Props {
+  headings: MarkdownHeading[];
+}
+
+const { headings } = Astro.props;
+const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 4);
+---
+
+{
+  toc.length > 0 && (
+    <nav class="toc" id="toc" aria-label="文章目录">
+      <p class="toc-title">目录</p>
+      <ul class="toc-list">
+        {toc.map((h) => (
+          <li class:list={['toc-item', `depth-${h.depth}`]}>
+            <a href={`#${h.slug}`}>{h.text}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
+
+<script>
+  const tocLinks = Array.from(
+    document.querySelectorAll<HTMLAnchorElement>('#toc .toc-item a')
+  );
+
+  if (tocLinks.length > 0) {
+    const targets = tocLinks
+      .map((link) => {
+        const id = decodeURIComponent(link.hash.slice(1));
+        return { link, el: document.getElementById(id) };
+      })
+      .filter((item): item is { link: HTMLAnchorElement; el: HTMLElement } =>
+        Boolean(item.el)
+      );
+
+    let ticking = false;
+
+    const highlight = () => {
+      let current: HTMLElement | null = null;
+
+      for (const { el } of targets) {
+        if (el.getBoundingClientRect().top <= 110) current = el;
+      }
+
+      if (!current) current = targets[0]?.el ?? null;
+
+      for (const { link, el } of targets) {
+        link.classList.toggle('is-active', el === current);
+      }
+
+      ticking = false;
+    };
+
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(highlight);
+        }
+      },
+      { passive: true }
+    );
+
+    highlight();
+  }
+</script>

@@ -1,0 +1,49 @@
+---
+import { SITE } from '../site.config';
+import Icon from './Icon.astro';
+
+const path = Astro.url.pathname;
+
+const isActive = (href: string) => {
+  if (href === '/') return path === '/' || path === '';
+  return path.startsWith(href.replace(/\/$/, ''));
+};
+---
+
+<header class="header">
+  <div class="container header-inner">
+    <a class="brand" href="/">
+      <span class="brand-mark">涵</span>
+      <span>{SITE.title}</span>
+    </a>
+
+    <nav class="nav" id="nav" aria-label="主导航">
+      {
+        SITE.nav.map((item) => (
+          <a
+            class:list={['nav-link', { 'is-active': isActive(item.href) }]}
+            href={item.href}
+            aria-current={isActive(item.href) ? 'page' : undefined}
+          >
+            {item.text}
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="header-actions">
+      <a class="icon-btn" href="/rss.xml" title="RSS 订阅" aria-label="RSS 订阅">
+        <Icon name="rss" size={17} />
+      </a>
+
+      <button class="icon-btn" id="theme-toggle" type="button" title="切换主题" aria-label="切换主题">
+        <Icon name="moon" size={17} class="theme-icon-moon" />
+        <Icon name="sun" size={17} class="theme-icon-sun" />
+      </button>
+
+      <button class="icon-btn nav-toggle" id="nav-toggle" type="button" aria-label="打开菜单">
+        <Icon name="menu" size={18} />
+      </button>
+    </div>
+  </div>
+</header>

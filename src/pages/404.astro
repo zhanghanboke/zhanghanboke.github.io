@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+---
+
+<BaseLayout title="页面未找到" description="404">
+  <div class="container">
+    <div class="empty" style="padding: 96px 24px">
+      <p style="font-size: 56px; font-weight: 800; margin: 0 0 8px; color: var(--accent)">
+        404
+      </p>
+      <p class="empty-title">这里什么都没有</p>
+      <p style="margin-bottom: 22px">你要找的页面可能被移动或者删掉了。</p>
+      <a class="social" href="/" style="display: inline-flex">
+        <Icon name="home" size={15} />
+        回到首页
+      </a>
+    </div>
+  </div>
+</BaseLayout>

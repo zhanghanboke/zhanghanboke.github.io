@@ -1,0 +1,55 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import { groupByYear } from '../utils/post';
+
+const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
+
+const groups = groupByYear(posts);
+---
+
+<BaseLayout title="归档" description={`共 ${posts.length} 篇文章，按年份归档。`}>
+  <div class="container">
+    <div class="page-head">
+      <h1 class="page-title">归档</h1>
+      <p class="page-desc">
+        <Icon name="file" size={14} /> 共 {posts.length} 篇文章，跨越 {groups.length} 个年份
+      </p>
+    </div>
+
+    {
+      groups.length > 0 ? (
+        groups.map((group) => (
+          <section class="archive-year">
+            <h2 class="year-heading">
+              {group.year}
+              <span class="year-count">{group.posts.length} 篇</span>
+            </h2>
+
+            <ul class="archive-list">
+              {group.posts.map((post) => (
+                <li class="archive-item">
+                  <span class="archive-date">
+                    {String(post.data.date.getMonth() + 1).padStart(2, '0')}-
+                    {String(post.data.date.getDate()).padStart(2, '0')}
+                  </span>
+                  <a class="archive-link" href={`/posts/${post.id}/`}>
+                    {post.data.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))
+      ) : (
+        <div class="empty">
+          <p class="empty-title">还没有任何文章</p>
+          <p>去写一篇吧。</p>
+        </div>
+      )
+    }
+  </div>
+</BaseLayout>

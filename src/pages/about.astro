@@ -1,0 +1,80 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import { SITE } from '../site.config';
+---
+
+<BaseLayout title="关于" description={`关于 ${SITE.author} 和这个博客。`}>
+  <div class="container">
+    <div class="page-head">
+      <h1 class="page-title">关于</h1>
+      <p class="page-desc">一个软件工程学生的个人站点。</p>
+    </div>
+
+    <div class="about-grid">
+      <section class="card">
+        <h2><Icon name="user" size={17} />我是谁</h2>
+        <p style="margin: 0 0 12px; color: var(--text-secondary)">
+          我是 {SITE.author}，网名 zhanghanboke。目前在武汉商学院读软件工程，
+          喜欢折腾能跑起来的东西——写点代码、搭个工具、把踩过的坑记下来。
+        </p>
+        <p style="margin: 0; color: var(--text-secondary)">
+          这个博客主要用来放技术笔记、项目复盘，以及一些没有归处的胡思乱想。
+        </p>
+      </section>
+
+      <section class="card">
+        <h2><Icon name="graduation" size={17} />基本情况</h2>
+        <ul class="fact-list">
+          <li>
+            <span class="fact-label">学校</span>
+            <span class="fact-value">武汉商学院 · 人工智能与大数据学院</span>
+          </li>
+          <li>
+            <span class="fact-label">专业</span>
+            <span class="fact-value">软件工程（本科）</span>
+          </li>
+          <li>
+            <span class="fact-label">技术栈</span>
+            <span class="fact-value">Java / Spring Boot / MySQL / Python / Vue</span>
+          </li>
+          <li>
+            <span class="fact-label">在做</span>
+            <span class="fact-value">学习、做项目，为 2027 暑期实习做准备</span>
+          </li>
+          <li>
+            <span class="fact-label">坐标</span>
+            <span class="fact-value">
+              <Icon name="map-pin" size={13} /> 武汉（老家湖北荆州石首）
+            </span>
+          </li>
+        </ul>
+      </section>
+
+      <section class="card">
+        <h2><Icon name="mail" size={17} />联系我</h2>
+        <div class="socials">
+          {
+            SITE.socials.map((s) => (
+              <a class="social" href={s.href} target="_blank" rel="noopener noreferrer">
+                <Icon name={s.icon} size={15} />
+                {s.name}
+              </a>
+            ))
+          }
+        </div>
+      </section>
+
+      <section class="card">
+        <h2><Icon name="code" size={17} />关于这个博客</h2>
+        <p style="margin: 0 0 10px; color: var(--text-secondary)">
+          用 <strong>Astro</strong> 构建，纯静态输出，零运行时框架。文章用 Markdown
+          写，提交到 GitHub 后由 Actions 自动构建并发布到 GitHub Pages。
+        </p>
+        <p style="margin: 0; color: var(--text-secondary)">
+          早期版本是 Hexo + Stun 主题，2026 年 10 月重做迁移到这个版本。
+        </p>
+      </section>
+    </div>
+  </div>
+</BaseLayout>

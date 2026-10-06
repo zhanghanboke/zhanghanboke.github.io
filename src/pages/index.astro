@@ -1,0 +1,100 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostCard from '../components/PostCard.astro';
+import Icon from '../components/Icon.astro';
+import { SITE } from '../site.config';
+import { collectTags } from '../utils/post';
+
+const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
+
+const latest = posts.slice(0, SITE.postsPerPage);
+const tags = collectTags(posts).slice(0, 14);
+---
+
+<BaseLayout>
+  <div class="container">
+    <section class="hero">
+      <div class="hero-card">
+        <div class="hero-body">
+          {
+            SITE.avatar && (
+              <img
+                class="hero-avatar"
+                src={SITE.avatar}
+                alt={SITE.author}
+                width="88"
+                height="88"
+              />
+            )
+          }
+
+          <div>
+            <h1 class="hero-title">你好，我是 <span class="grad">{SITE.author}</span></h1>
+            <p class="hero-desc">{SITE.description}</p>
+
+            <div class="socials">
+              {
+                SITE.socials.map((s) => (
+                  <a
+                    class="social"
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Icon name={s.icon} size={15} />
+                    {s.name}
+                  </a>
+                ))
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2 class="section-title">最新文章</h2>
+        {posts.length > 0 && <a class="section-more" href="/archive/">全部 {posts.length} 篇 →</a>}
+      </div>
+
+      {
+        latest.length > 0 ? (
+          <div class="post-list">
+            {latest.map((post) => (
+              <PostCard post={post} />
+            ))}
+          </div>
+        ) : (
+          <div class="empty">
+            <p class="empty-title">还没有文章</p>
+            <p>在 src/content/posts/ 下新建一个 .md 文件就能发布第一篇。</p>
+          </div>
+        )
+      }
+    </section>
+
+    {
+      tags.length > 0 && (
+        <section style="margin-top: 44px">
+          <div class="section-head">
+            <h2 class="section-title">标签</h2>
+            <a class="section-more" href="/tags/">全部标签 →</a>
+          </div>
+
+          <div class="tag-cloud">
+            {tags.map((tag) => (
+              <a class="tag-cloud-item" href={`/tags/${encodeURIComponent(tag.name)}/`}>
+                #{tag.name}
+                <span class="tag-count">{tag.count}</span>
+              </a>
+            ))}
+          </div>
+        </section>
+      )
+    }
+  </div>
+</BaseLayout>

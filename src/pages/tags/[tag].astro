@@ -1,0 +1,44 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import Icon from '../../components/Icon.astro';
+import { collectTags } from '../../utils/post';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts', ({ data }) => !data.draft);
+
+  return collectTags(posts).map((tag) => ({
+    params: { tag: tag.name },
+    props: { tag: tag.name, count: tag.count },
+  }));
+}
+
+const { tag } = Astro.props;
+
+const posts = (
+  await getCollection(
+    'posts',
+    ({ data }) => !data.draft && (data.tags ?? []).includes(tag)
+  )
+).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+---
+
+<BaseLayout title={`#${tag}`} description={`标签「${tag}」下的全部文章，共 ${posts.length} 篇。`}>
+  <div class="container">
+    <div class="page-head">
+      <h1 class="page-title">#{tag}</h1>
+      <p class="page-desc">
+        <Icon name="file" size={14} /> 共 {posts.length} 篇文章
+      </p>
+    </div>
+
+    <div class="post-list">
+      {posts.map((post) => <PostCard post={post} />)}
+    </div>
+
+    <p style="margin-top: 32px">
+      <a href="/tags/">← 返回全部标签</a>
+    </p>
+  </div>
+</BaseLayout>

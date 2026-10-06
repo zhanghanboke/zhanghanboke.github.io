@@ -1,0 +1,137 @@
+---
+import '../styles/global.css';
+import { SITE } from '../site.config';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Icon from '../components/Icon.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  type?: 'website' | 'article';
+  /** 文章页开启阅读进度条 */
+  progress?: boolean;
+}
+
+const {
+  title,
+  description = SITE.description,
+  type = 'website',
+  progress = false,
+} = Astro.props;
+
+const pageTitle = title ? `${title} | ${SITE.title}` : `${SITE.title} · ${SITE.subtitle}`;
+const canonical = new URL(Astro.url.pathname, SITE.url).href;
+const ogImage = new URL(SITE.avatar, SITE.url).href;
+---
+
+<!doctype html>
+<html lang={SITE.lang} data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content={SITE.author} />
+    <link rel="canonical" href={canonical} />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate" type="application/rss+xml" title={SITE.title} href="/rss.xml" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content={SITE.title} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content="zh_CN" />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary" />
+
+    <!-- 主题预设：必须在样式前执行，避免刷新时闪白 -->
+    <script is:inline>
+      (function () {
+        try {
+          var saved = localStorage.getItem('theme');
+          var prefersDark =
+            window.matchMedia &&
+            window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var theme = saved || (prefersDark ? 'dark' : 'light');
+          document.documentElement.setAttribute('data-theme', theme);
+        } catch (e) {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      })();
+    </script>
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main">跳到正文</a>
+
+    {progress && <div class="reading-progress" id="reading-progress"></div>}
+
+    <div class="site">
+      <Header />
+
+      <main class="main" id="main">
+        <slot />
+      </main>
+
+      <Footer />
+    </div>
+
+    <button class="back-to-top" id="back-to-top" aria-label="返回顶部" title="返回顶部">
+      <Icon name="arrow-up" size={17} />
+    </button>
+
+    <script>
+      /* 主题切换 */
+      const root = document.documentElement;
+      const themeToggle = document.getElementById('theme-toggle');
+      themeToggle?.addEventListener('click', () => {
+        const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        root.setAttribute('data-theme', next);
+        try {
+          localStorage.setItem('theme', next);
+        } catch (e) {
+          /* 忽略隐私模式下的写入失败 */
+        }
+      });
+
+      /* 移动端菜单 */
+      const navToggle = document.getElementById('nav-toggle');
+      const nav = document.getElementById('nav');
+      navToggle?.addEventListener('click', () => {
+        nav?.classList.toggle('is-open');
+      });
+
+      /* 返回顶部 */
+      const backTop = document.getElementById('back-to-top');
+      backTop?.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
+      /* 阅读进度条 */
+      const progressBar = document.getElementById('reading-progress');
+
+      const updateOnScroll = () => {
+        const y = window.scrollY;
+
+        if (backTop) {
+          backTop.classList.toggle('is-visible', y > 400);
+        }
+
+        if (progressBar) {
+          const max = document.documentElement.scrollHeight - window.innerHeight;
+          progressBar.style.width = max > 0 ? `${Math.min(100, (y / max) * 100)}%` : '0%';
+        }
+      };
+
+      window.addEventListener('scroll', updateOnScroll, { passive: true });
+      window.addEventListener('resize', updateOnScroll);
+      updateOnScroll();
+    </script>
+  </body>
+</html>
