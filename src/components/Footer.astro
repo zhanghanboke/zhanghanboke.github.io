@@ -1,8 +1,10 @@
 ---
 import { SITE } from '../site.config';
 import Icon from './Icon.astro';
+import { formatYear } from '../utils/post';
 
-const year = new Date().getFullYear();
+/* 用东八区取年份：构建机是 UTC 时，跨年那几小时会算成前一年 */
+const year = formatYear(new Date());
 const range = year > SITE.since ? `${SITE.since}–${year}` : `${SITE.since}`;
 ---
 

@@ -2,7 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from '../components/Icon.astro';
-import { groupByYear } from '../utils/post';
+import { formatShort, groupByYear } from '../utils/post';
 
 const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
   (a, b) => b.data.date.getTime() - a.data.date.getTime()
@@ -38,10 +38,7 @@ const groups = groupByYear(posts);
             <ul class="archive-list">
               {group.posts.map((post) => (
                 <li class="archive-item">
-                  <span class="archive-date">
-                    {String(post.data.date.getMonth() + 1).padStart(2, '0')}-
-                    {String(post.data.date.getDate()).padStart(2, '0')}
-                  </span>
+                  <span class="archive-date">{formatShort(post.data.date)}</span>
                   <a class="archive-link" href={`/posts/${post.id}/`}>
                     {post.data.title}
                   </a>

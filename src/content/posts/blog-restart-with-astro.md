@@ -1,6 +1,6 @@
 ---
 title: 博客重启：从 Hexo 换到 Astro
-date: 2026-10-06
+date: '2026-10-06T20:17:00+08:00'
 tags: [Astro, 博客, 前端]
 category: 折腾
 description: 四年前搭的 Hexo 博客，源码早就丢了，只剩一堆生成的 HTML。这次干脆推倒重来，换成 Astro 从头写一遍。

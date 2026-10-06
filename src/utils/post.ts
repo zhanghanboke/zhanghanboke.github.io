@@ -1,18 +1,40 @@
 import type { CollectionEntry } from 'astro:content';
 
-/** 统一日期格式：2026-10-06 */
+/**
+ * 日期一律按东八区格式化，**不跟随构建机的本地时区**。
+ *
+ * 为什么必须锁时区：本地开发是 UTC+8，GitHub Actions 是 UTC。
+ * frontmatter 的 date 一旦带时刻（如 2026-10-06T02:00:00+08:00），
+ * 用 getFullYear()/getMonth()/getDate() 取值就会跟着构建机走 ——
+ * 云端构建出来的日期可能比本地少一天（凌晨发布的文章尤其明显）。
+ * 锁定 Asia/Shanghai 后两边结果完全一致。
+ *
+ * 附带好处：下面这组函数只依赖 formatToParts，不再散落 getXxx() 调用，
+ * 以后要改时区只动一个常量。
+ */
+const TIME_ZONE = 'Asia/Shanghai';
+
+/* en-CA 的短日期格式恰好就是 YYYY-MM-DD */
+const isoDay = new Intl.DateTimeFormat('en-CA', {
+  timeZone: TIME_ZONE,
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+});
+
+/** 统一日期格式：2026-10-06（按东八区） */
 export function formatDate(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
+  return isoDay.format(date);
 }
 
 /** 归档页用的「10-06」短日期 */
 export function formatShort(date: Date): string {
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
-  return `${m}-${d}`;
+  return formatDate(date).slice(5);
+}
+
+/** 取年份数字（按东八区），归档分组用 */
+export function formatYear(date: Date): number {
+  return Number(formatDate(date).slice(0, 4));
 }
 
 /** 把 Markdown 正文压成一段纯文本摘要 */
@@ -61,7 +83,7 @@ export function groupByYear(posts: CollectionEntry<'posts'>[]) {
   const map = new Map<number, CollectionEntry<'posts'>[]>();
 
   for (const post of posts) {
-    const year = post.data.date.getFullYear();
+    const year = formatYear(post.data.date);
     if (!map.has(year)) map.set(year, []);
     map.get(year)!.push(post);
   }
