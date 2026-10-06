@@ -28,4 +28,13 @@ export default defineConfig({
   devToolbar: {
     enabled: false,
   },
+
+  vite: {
+    build: {
+      // 默认的 lightningcss 会把 backdrop-filter 改写成只剩 -webkit- 前缀版本，
+      // 而 Firefox 只认标准属性 —— 结果就是 Firefox 上毛玻璃整个失效。
+      // 换 esbuild 压缩：只做压缩，不动前缀，标准属性 + -webkit- 两份都保留。
+      cssMinify: 'esbuild',
+    },
+  },
 });

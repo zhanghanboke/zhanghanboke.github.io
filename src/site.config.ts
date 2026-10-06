@@ -25,7 +25,7 @@ export const SITE = {
   postsPerPage: 10,
 
   /** 头像，放在 public/ 下用 / 开头；留空字符串则不显示头像 */
-  avatar: '/avatar.svg',
+  avatar: '/avatar.jpg',
 
   /** 顶部导航 */
   nav: [

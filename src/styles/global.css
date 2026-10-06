@@ -21,12 +21,21 @@
 
   --nav-h: 62px;
 
-  /* 背景层次（浅色） */
+  /* 背景层次（浅色）—— 加了壁纸后这些都改成半透明，让底图透出来。
+     取值都挑成「叠在纯白底上 ≈ 原设计色」的半透明色，
+     这样 ?bg=off 关掉壁纸后不需要任何额外覆盖，观感自动回到原样。 */
   --bg: #ffffff;
-  --bg-subtle: #f6f6f7;
-  --card: #ffffff;
-  --card-hover: #fafafa;
-  --bg-code: #f7f7f8;
+  --bg-subtle: rgba(240, 240, 243, 0.78);
+  --card: rgba(255, 255, 255, 0.86);
+  --card-hover: rgba(255, 255, 255, 0.97);
+  --bg-code: rgba(247, 247, 248, 0.94);
+
+  /* 背景壁纸层 */
+  --bg-image: url('/bg/bg.jpg');
+  /* veil 越大壁纸越淡：0.74 ≈ 图片只保留约四分之一强度，做氛围底图不抢正文 */
+  --bg-veil: rgba(255, 255, 255, 0.74);
+  /* 原图会被 cover 放大约 2 倍，柔化掉细节才能退居氛围层 */
+  --bg-soften: 8px;
 
   /* 文字 */
   --text: #18181b;
@@ -48,7 +57,7 @@
   --shadow: 0 2px 10px rgba(24, 24, 27, 0.06);
   --shadow-lg: 0 14px 34px -10px rgba(24, 24, 27, 0.16);
 
-  --nav-bg: rgba(255, 255, 255, 0.78);
+  --nav-bg: rgba(255, 255, 255, 0.72);
   --pill: rgba(24, 24, 27, 0.05);
   --pill-active: rgba(24, 24, 27, 0.09);
 
@@ -57,10 +66,18 @@
 
 [data-theme='dark'] {
   --bg: #141414;
-  --bg-subtle: #1a1a1a;
-  --card: #1c1c1c;
-  --card-hover: #232323;
-  --bg-code: #191919;
+  /* 深色下卡片必须比背景「亮」才浮得起来。
+     壁纸被 --bg-veil 压暗后底色大约在 30 上下（比纯 #141414 亮），
+     所以卡片用「中灰 + 高不透明度」：既不透过底纹显花，又稳定高于底图。
+     关掉壁纸时叠在 #141414 上 ≈ #292929，比原来的 #1c1c1c 略亮，仍在同一档。 */
+  --bg-subtle: rgba(255, 255, 255, 0.04);
+  --card: rgba(48, 48, 54, 0.75);
+  --card-hover: rgba(62, 62, 70, 0.86);
+  --bg-code: rgba(0, 0, 0, 0.28);
+
+  /* 背景壁纸层（深色）—— 遮罩明显更重：深色主题不该让大片亮色抢戏，
+     底图只留一点暗色调氛围，同时保证正文对比度 */
+  --bg-veil: rgba(10, 10, 12, 0.84);
 
   --text: #ededed;
   --text-secondary: #a1a1aa;
@@ -79,7 +96,7 @@
   --shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
   --shadow-lg: 0 14px 34px -10px rgba(0, 0, 0, 0.6);
 
-  --nav-bg: rgba(20, 20, 20, 0.78);
+  --nav-bg: rgba(18, 18, 20, 0.7);
   --pill: rgba(255, 255, 255, 0.06);
   --pill-active: rgba(255, 255, 255, 0.11);
 
@@ -97,6 +114,8 @@ html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
   scroll-padding-top: 92px;
+  /* 兜底底色：壁纸加载失败或关闭时也不会露白/露黑 */
+  background: var(--bg);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -113,10 +132,41 @@ body {
   font-size: 16px;
   line-height: 1.75;
   color: var(--text);
-  background: var(--bg);
+  /* 透明：真正的底色在 html 上，壁纸层走 body::before / ::after */
+  background: transparent;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  transition: background-color 0.25s ease, color 0.25s ease;
+  transition: color 0.25s ease;
+}
+
+/* ---------- 背景壁纸层 ----------
+   层次自下而上：
+     html 底色  →  body::before 壁纸  →  body::after 淡化遮罩  →  .site 内容
+   两者都是 fixed，所以滚动时壁纸纹丝不动（视差观感），内容浮动其上。
+   --bg-veil 管「半透明程度」，调它不影响图片本身。
+   ------------------------------------------------------------------ */
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  pointer-events: none;
+}
+
+body::before {
+  /* 外扩一点，抵掉 blur 在高斯核边缘产生的透明羽化 */
+  inset: calc(-1 * var(--bg-soften) * 6);
+  z-index: -2;
+  background: var(--bg-image) center center / cover no-repeat;
+  /* 模糊 + 轻微去饱和：底图只留色块氛围，细节不跟正文抢注意力 */
+  filter: blur(var(--bg-soften)) saturate(0.85);
+  /* 提前提升为合成层，滚动时不重绘 */
+  transform: translateZ(0);
+}
+
+body::after {
+  inset: 0;
+  z-index: -1;
+  background: var(--bg-veil);
 }
 
 img,
@@ -176,6 +226,9 @@ button {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  /* 刻意不给 position/z-index —— 一旦这里建立层叠上下文，
+     后代卡片上的 backdrop-filter 就只能采样 .site 内部（空），Chrome 会渲染成黑块。
+     壁纸层是负 z-index，本来就在普通流内容之下，无需额外提升。 */
 }
 
 .main {
@@ -593,7 +646,15 @@ button {
   gap: 7px;
   font-size: 13px;
   color: var(--text-tertiary);
-  margin-bottom: 26px;
+  width: fit-content;
+  max-width: 100%;
+  margin-bottom: 20px;
+  padding: 7px 15px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-full);
+  backdrop-filter: saturate(150%) blur(14px);
+  -webkit-backdrop-filter: saturate(150%) blur(14px);
 }
 
 .crumb a { color: var(--text-tertiary); }
@@ -605,6 +666,13 @@ button {
   grid-template-columns: minmax(0, 1fr) 216px;
   gap: 46px;
   align-items: start;
+  /* 正文 + 目录整体罩一层磨砂衬底，脱离壁纸干扰，长文更好读。
+     大块内容刻意不加 backdrop-filter —— 滚动时逐帧重算模糊很费，靠半透明 + 壁纸自带柔化即可。 */
+  padding: 36px 38px 42px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
 }
 
 .post-hero {
@@ -974,6 +1042,18 @@ button {
   border-radius: var(--radius-full);
 }
 
+/* 每个年份一张磨砂卡片：归档页文字本来就少，没有衬底壁纸会喧宾夺主 */
+.archive-year {
+  margin-bottom: 18px;
+  padding: 20px 24px 22px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: saturate(150%) blur(16px);
+  -webkit-backdrop-filter: saturate(150%) blur(16px);
+}
+
 .archive-list { list-style: none; margin: 0; padding: 0; }
 
 .archive-item {
@@ -1116,7 +1196,11 @@ button {
 
 /* ---------- 19. 响应式 ---------- */
 @media (max-width: 1000px) {
-  .post-layout { grid-template-columns: 1fr; gap: 0; }
+  .post-layout {
+    grid-template-columns: 1fr;
+    gap: 0;
+    padding: 30px 30px 34px;
+  }
   .toc { display: none; }
 }
 
@@ -1161,6 +1245,12 @@ button {
   .post-title { font-size: 25px; }
   .post-hero { text-align: left; }
 
+  .post-layout {
+    padding: 22px 18px 26px;
+    border-radius: var(--radius);
+  }
+  .crumb { padding: 6px 12px; font-size: 12.5px; }
+
   .prose { font-size: 16px; }
   .prose h2 { font-size: 21px; }
   .prose h3 { font-size: 18px; }
@@ -1169,6 +1259,7 @@ button {
   .post-nav-item.is-next { text-align: left; }
 
   .archive-item { flex-direction: column; gap: 2px; padding: 10px 8px; }
+  .archive-year { padding: 16px 14px 18px; }
 
   .card { padding: 20px 18px; }
 
@@ -1177,11 +1268,52 @@ button {
   .back-to-top { right: 16px; bottom: 16px; }
 }
 
-/* ---------- 20. 打印 ---------- */
+/* ---------- 20. 背景壁纸适配层 ----------
+   壁纸做底之后，所有"浮在页面上"的小块统一改成磨砂玻璃，
+   免得半透明底图下边界和文字糊在一起。
+   注意：正文大块（.post-layout）刻意排除在外，见上方注释。
+   ------------------------------------------------------------------ */
+.hero,
+.post-card,
+.empty,
+.post-nav-item,
+.tag-cloud-item,
+.card,
+.abstract,
+.license,
+.back-to-top,
+.footer {
+  /* 注意：这里必须用字面量而非 var(--frost)。
+     压缩器在值含 var() 时无法识别"标准属性 + -webkit- 前缀"这一对，
+     会把标准属性 backdrop-filter 整条丢掉，只留 -webkit-。 */
+  backdrop-filter: saturate(150%) blur(16px);
+  -webkit-backdrop-filter: saturate(150%) blur(16px);
+}
+
+/* ?bg=off —— 关掉壁纸层，回到纯色底（卡片半透明叠在纯色上，观感≈原样） */
+[data-bg='off'] body::before,
+[data-bg='off'] body::after {
+  display: none;
+}
+
+/* ---------- 21. 打印 ---------- */
 @media print {
   .header, .footer, .toc, .back-to-top, .post-nav, .reading-progress {
     display: none !important;
   }
-  .post-layout { grid-template-columns: 1fr; }
-  body { background: #fff; color: #000; }
+  .post-layout {
+    grid-template-columns: 1fr;
+    padding: 0;
+    background: none;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .hero, .post-card, .card, .abstract, .license, .crumb {
+    background: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  html, body { background: #fff; color: #000; }
+  body::before, body::after { display: none; }
 }
