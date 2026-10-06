@@ -1,6 +1,6 @@
 ---
 title: ArrayList 和 LinkedList，到底该用哪个
-date: 2026-09-27
+date: '2026-10-06T20:08:00+08:00'
 tags: [Java, 数据结构]
 category: 技术笔记
 description: 从底层数据结构出发，把 ArrayList 和 LinkedList 的复杂度、内存开销和真实使用场景捋一遍。
